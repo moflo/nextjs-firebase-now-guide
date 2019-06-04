@@ -26,20 +26,20 @@ export const meta = {
   image: `${
     process.env.ASSETS
   }/guides/deploying-next-firebase-with-now/deploying-next-firebase-with-now.png`,
-  editUrl: 'pages/guides/deploying-next-and-mysql-with-now.mdx',
+  editUrl: 'pages/guides/deploying-next-firebase-with-now.mdx',
   lastEdited: '2019-04-27T21:46:17.000Z'
 }
 
 In this guide, we will walk you through creating and [deploying](/docs/v2/deployments/basics/) a [Next.js](https://nextjs.org/) app with the most popular open source database in the world, [MySQL](https://www.mysql.com/), on [ZEIT Now](/docs/v2).
 
-[Next.js](https://nextjs.org/) from [ZEIT](https://zeit.co) is a production-ready framework that can help you create fast React applications. By using it along with MySQL, you can create a fast, modern web app that interacts with customer data in a performant manner.
+[Next.js](https://nextjs.org/) from [ZEIT](https://zeit.co) is a production-ready framework that can help you create fast React applications. By using it along with Firebase, you can create a fast, modern web app that interacts with customer data in a performant manner.
 
 We demonstrate the set up via an [example app](https://next-mysql.now.sh), that displays a paginated, gallery view of robot profiles, with individual profiles just a click away. The finished app can be found at <https://next-mysql.now.sh>.
 
 <Image
   src={`${
     process.env.ASSETS
-  }/guides/deploying-next-mysql-with-now/deploying-next-mysql-with-now.png`}
+  }/guides/deploying-next-mysql-with-now/deploying-next-firebase-with-now.png`}
   width={650}
   height={380}
   oversize
@@ -47,16 +47,15 @@ We demonstrate the set up via an [example app](https://next-mysql.now.sh), that 
 
 ## Step 1: Populating Your MySQL Database
 
-To use this guide, you will need to setup a remote MySQL database. Many cloud providers offer this service, such as [Amazon Web Services](https://aws.amazon.com/rds/sqlserver/), [Google Cloud](https://cloud.google.com/sql/) and [Microsoft Azure](https://azure.microsoft.com/en-gb/services/sql-database/). Most of them offer a free trial.
+To use this guide, you will need to setup a remote Firestore database. You will need to set up your Firestore database on either [Google Cloud](https://cloud.google.com/firestore/) or on [Firebase](https://firebase.com/). As of this writing, only Firebase Firestore is offers a free trial.
 
 <Note>Please read the trial terms and conditions carefully.</Note>
 
-Once you have your remote MySQL database setup, you should make a note of your database credentials:
+Once you have your Firestore database setup, you should make a note of your service account credentials:
 
 - Database name
-- Database hostname
-- Database username
-- Database password
+- Database URL
+- Service Account JSON file
 
 Using these credentials, you can connect to your database and insert the [example data](https://github.com/zeit/now-examples/blob/master/nextjs-mysql/db.sql) into a new table named `profiles`.
 
@@ -78,36 +77,22 @@ Next, [initialize](https://yarnpkg.com/lang/en/docs/cli/init/) the project:
   Initializing the project, this creates a <InlineCode>package.json</InlineCode>{' '}file.
 </Caption>
 
-Yarn will present some initial questions to set up your project, complete this and when done, add [`serverless-mysql`](https://github.com/jeremydaly/serverless-mysql) and [`sql-template-strings`](https://github.com/felixfbecker/node-sql-template-strings) as [dependencies](https://yarnpkg.com/en/docs/cli/add#toc-yarn-add):
+Yarn will present some initial questions to set up your project, complete this and when done, add [`firebase-admin`](https://github.com/jeremydaly/serverless-mysql) and [`isomorphic-unfetch`](https://github.com/felixfbecker/node-sql-template-strings) as [dependencies](https://yarnpkg.com/en/docs/cli/add#toc-yarn-add):
 
 <TerminalInput>yarn add serverless-mysql sql-template-strings</TerminalInput>
 <Caption>
   Adding <InlineCode>serverless-mysql</InlineCode> and <InlineCode>sql-template-strings</InlineCode> as <GenericLink href="https://yarnpkg.com/lang/en/docs/installing-dependencies/">dependencies</GenericLink> to the project.
 </Caption>
 
-Adding [`serverless-mysql`](https://github.com/jeremydaly/serverless-mysql) to the project will allow you to make connections to your MySQL database. In addition to this, it also **manages connections**, ensuring you do not 'max out' the available connections.
+Adding [`firebase-admin`](https://github.com/jeremydaly/serverless-mysql) to the project demonstrates one method of using a serverless function to access the Firestore database and is used in the `index.js` function.
 
-Managing MySQL connections is an essential part of using it **successfully in a serverless environment**. This is because [serverless functions](/docs/v2/deployments/concepts/lambdas/) will create multiple database connections as traffic increases. Therefore, all connections can be consumed quickly unless managed correctly - this is **all handled for you** by [`serverless-mysql`](https://github.com/jeremydaly/serverless-mysql).
+Adding [`isomorphic-unfetch`](https://github.com/jeremydaly/serverless-mysql) to the project demonstrates a second method of using a serverless function to access the Firestore database via isomorphic fetch and is used in the `profile.js` function.
 
-<Note>
-  Using <InlineCode>sql-template-strings</InlineCode> is strongly recommended to
-  prevent attacks via{' '}
-  <GenericLink href="https://en.wikipedia.org/wiki/SQL_injection">
-    SQL Injection
-  </GenericLink>{' '}
-  by using{' '}
-  <GenericLink href="https://blogs.msdn.microsoft.com/sqlphp/2008/09/30/how-and-why-to-use-parameterized-queries/">
-    parameterized queries
-  </GenericLink>
-  .
-</Note>
 
 Now, add your database credentials from [step 1](#step-1:-populating-your-mysql-database) to the project as [secrets](/docs/v2/deployments/environment-variables-and-secrets#securing-environment-variables-using-secrets) using the [Now CLI](/download#now-cli) to keep them secure:
 
 <TerminalInput>
-  now secrets add MYSQL_HOST $database-hostname && now secrets add MYSQL_USER
-  $database-username && now secrets add MYSQL_DATABASE $database-name && now
-  secrets add MYSQL_PASSWORD $database-password
+  now secrets add FIREBASE_HOST $database-hostname 
 </TerminalInput>
 <Caption>
   Adding <GenericLink href="/v2/deployments/environment-variables-and-secrets#securing-environment-variables-using-secrets">secrets</GenericLink> to the project.
