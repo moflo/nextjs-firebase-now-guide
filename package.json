@@ -1,0 +1,18 @@
+{
+  "name": "nextjs-firebase",
+  "version": "1.0.0",
+  "description": "Serverless NextJS app using Firebase Firestore hosted on Now",
+  "main": "index.js",
+  "repository": "git@github.com:moflo/nextjs-firebase.git",
+  "author": "moflo",
+  "license": "MIT",
+  "dependencies": {
+    "encoding": "^0.1.12",
+    "firebase-admin": "^7.3.0",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "^8.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "request": "^2.88.0"
+  }
+}
