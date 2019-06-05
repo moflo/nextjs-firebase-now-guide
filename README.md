@@ -3,6 +3,16 @@
 https://zeit.co/guides/deploying-next-and-mysql-with-now/
 https://github.com/zeit/docs/blob/master/pages/guides/deploying-next-and-mysql-with-now.mdx
 
+
+#### Notes
+- This NextJS app does not use authentication
+- Firestore rules need to therefore be promiscuous
+- This demonstrates both a server-side `firebase-admin` and REST API based Firestore query
+- This also uses Now Lambda functions
+
+<img src="https://github.com/moflo/nextjs-firebase-now-guide/blob/master/deploying-next-firebase-with-now.png" width="600">
+
+
 ### MDX Guide
 <details>
 
